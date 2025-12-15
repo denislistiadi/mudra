@@ -1,15 +1,15 @@
 import { z } from 'zod';
+import {
+  MONGODB_URI,
+  MONGODB_NAME
+} from '$env/static/private';
 
 const schema = z.object({
   MONGODB_URI: z.string().min(1),
   MONGODB_NAME: z.string().min(1)
 });
 
-const parsed = schema.safeParse(process.env);
-
-if (!parsed.success) {
-  console.error(parsed.error.format());
-  throw new Error('Invalid environment variables');
-}
-
-export const env = parsed.data;
+export const env = schema.parse({
+  MONGODB_URI,
+  MONGODB_NAME
+});
