@@ -1,15 +1,12 @@
-import { MongoClient, Db } from 'mongodb';
-import { env } from '$lib/config/env';
+import { MongoClient } from 'mongodb';
+import { appEnv } from '$lib/config/env.svelte';
 
-let client: MongoClient;
-let db: Db;
+let client: MongoClient | null = null;
 
-export async function getDb(): Promise<Db> {
-  if (db) return db;
-
-  client = new MongoClient(env.MONGODB_URI);
-  await client.connect();
-
-  db = client.db(env.MONGODB_NAME);
-  return db;
+export async function getDb() {
+  if (!client) {
+    client = new MongoClient(appEnv.MONGODB_URI);
+    await client.connect();
+  }
+  return client.db(appEnv.MONGODB_NAME);
 }

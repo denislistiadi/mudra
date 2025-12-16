@@ -66,4 +66,9 @@ export class AuthService {
 
 		return session;
 	}
+
+	static async invalidateSession(sessionId: string) {
+		const sessions = await sessionsCollection<Session>();
+		await sessions.deleteOne({ _id: new ObjectId(sessionId) });
+	}
 }
