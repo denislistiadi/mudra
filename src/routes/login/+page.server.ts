@@ -1,5 +1,6 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { AuthService } from '$lib/server/auth/auth.service';
+import { setSessionCookie } from '$lib/server/http/session-cookie';
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
@@ -12,12 +13,7 @@ export const actions: Actions = {
       return fail(400, { error: 'Invalid credentials' });
     }
 
-    cookies.set('session_id', session._id!.toHexString(), {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure:  process.env.NODE_ENV === 'production'
-    });
+    setSessionCookie(cookies, session._id!.toHexString());
 
     throw redirect(302, '/dashboard');
   }
