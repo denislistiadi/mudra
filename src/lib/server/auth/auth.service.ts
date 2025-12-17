@@ -32,6 +32,21 @@ export class AuthService {
 		}
 	}
 
+	static async safeRegister(
+		email: string,
+		password: string
+	): Promise<{ ok: true } | { ok: false; error: string }> {
+		try {
+			await this.register(email, password);
+			return { ok: true };
+		} catch (err) {
+			if (err instanceof Error && err.message === 'EMAIL_ALREADY_EXISTS') {
+				return { ok: false, error: 'Email already registered' };
+			}
+			throw err;
+		}
+	}
+
 	static async login(email: string, password: string): Promise<Session | null> {
 		const users = await usersCollection<User>();
 		const user = await users.findOne({ email });

@@ -4,35 +4,32 @@ import { AuthService } from '$lib/server/auth/auth.service';
 import { setSessionCookie } from '$lib/server/http/session-cookie';
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
-		const data = await request.formData();
-		const email = String(data.get('email') || '').trim();
-		const password = String(data.get('password') || '');
+  default: async ({ request, cookies }) => {
+    const form = await request.formData();
 
-		if (!email || !password) {
-			return fail(400, { error: 'Email and password are required' });
-		}
+    const email = String(form.get('email') ?? '').trim();
+    const password = String(form.get('password') ?? '');
 
-		if (password.length < 8) {
-			return fail(400, { error: 'Password must be at least 8 characters' });
-		}
+    if (!email || !password) {
+      return fail(400, { error: 'Email and password are required' });
+    }
 
-		try {
-			await AuthService.register(email, password);
-		} catch (err) {
-			if (err instanceof Error && err.message === 'EMAIL_ALREADY_EXISTS') {
-				return fail(400, { error: 'Email already registered' });
-			}
-			throw err;
-		}
+    if (password.length < 8) {
+      return fail(400, { error: 'Password must be at least 8 characters' });
+    }
 
-		const session = await AuthService.login(email, password);
-		if (!session) {
-			return fail(500, { error: 'Failed to create session' });
-		}
+    const result = await AuthService.safeRegister(email, password);
+    if (!result.ok) {
+      return fail(400, { error: result.error });
+    }
 
-		setSessionCookie(cookies, session._id!.toHexString());
+    const session = await AuthService.login(email, password);
+    if (!session) {
+      return fail(500, { error: 'Failed to create session' });
+    }
 
-		throw redirect(302, '/dashboard');
-	}
+    setSessionCookie(cookies, session._id!.toHexString());
+
+    throw redirect(302, '/dashboard');
+  }
 };
