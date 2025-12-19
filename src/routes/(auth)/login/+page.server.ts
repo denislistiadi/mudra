@@ -1,20 +1,34 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { AuthService } from '$lib/server/auth/auth.service';
 import { setSessionCookie } from '$lib/server/http/session-cookie';
+import { loginSchema } from '$lib/server/auth/auth.schema';
+import type { AuthFormErrors } from '$lib/types/form-error';
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
-    const data = await request.formData();
-    const email = String(data.get('email'));
-    const password = String(data.get('password'));
+	default: async ({ request, cookies }) => {
+		const formData = Object.fromEntries(await request.formData());
 
-    const session = await AuthService.login(email, password);
-    if (!session) {
-      return fail(400, { error: 'Invalid credentials' });
-    }
+		const parsed = loginSchema.safeParse(formData);
+		if (!parsed.success) {
+			return fail(400, {
+				errors: parsed.error.flatten().fieldErrors as AuthFormErrors
+			});
+		}
 
-    setSessionCookie(cookies, session._id!.toHexString());
+		const { email, password } = parsed.data;
 
-    throw redirect(302, '/dashboard');
-  }
+		const session = await AuthService.login(email, password);
+		if (!session) {
+			const errors: AuthFormErrors = {
+				email: ['Email atau password salah'],
+				password: []
+			};
+
+			return fail(400, { errors });
+		}
+
+		setSessionCookie(cookies, session._id!.toHexString());
+
+		throw redirect(302, '/dashboard');
+	}
 };
