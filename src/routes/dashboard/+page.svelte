@@ -1,10 +1,13 @@
-<script>
-  export let data;
+<script lang="ts">
+	export let data: {
+		user: {
+			email: string;
+		} | null;
+	};
 </script>
 
-<h1>Dashboard {data.session.userId}</h1>
-<p>You are authenticated.</p>
+<h1>Dashboard</h1>
 
-<form method="POST" action="/logout">
-  <button>Logout</button>
-</form>
+<p>
+	Welcome{data.user ? `, ${data.user.email}` : ''}
+</p>
