@@ -3,7 +3,7 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 
-	export let id: string | undefined;
+	export let id: string | null = null;
 	export let name = 'password';
 	export let value = '';
 
