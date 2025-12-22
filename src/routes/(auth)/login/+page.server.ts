@@ -10,8 +10,10 @@ export const actions: Actions = {
 
 		const parsed = loginSchema.safeParse(formData);
 		if (!parsed.success) {
+			const errors = parsed.error.flatten().fieldErrors;
 			return fail(400, {
-				errors: parsed.error.flatten().fieldErrors as AuthFormErrors
+				errors: errors as AuthFormErrors,
+				formError: errors as AuthFormErrors
 			});
 		}
 
@@ -19,12 +21,12 @@ export const actions: Actions = {
 
 		const session = await AuthService.login(email, password);
 		if (!session) {
-			const errors: AuthFormErrors = {
+			const formError: AuthFormErrors = {
 				email: ['Email atau password salah'],
 				password: []
 			};
 
-			return fail(400, { errors });
+			return fail(400, { formError });
 		}
 
 		setSessionCookie(cookies, session._id!.toHexString());

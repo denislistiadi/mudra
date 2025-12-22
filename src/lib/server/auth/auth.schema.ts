@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-	email: z.string().email('Email tidak valid'),
-	password: z.string().min(8, 'Password minimal 8 karakter')
+	email: z.string('Email wajib diisi').email('Format email tidak valid'),
+	password: z.string('Password wajib diisi').min(8, 'Password minimal 8 karakter')
 });
 
-export type LoginInput = z.infer<typeof loginSchema>;
+export type LoginSchema = z.infer<typeof loginSchema>;

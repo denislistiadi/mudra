@@ -5,9 +5,11 @@
 
 	export let form: {
 		errors?: AuthFormErrors;
+		formError?: AuthFormErrors;
 	};
 
 	$: errors = form?.errors ?? {};
+	$: formError = form?.formError;
 </script>
 
 <div class="space-y-8">
@@ -16,6 +18,12 @@
 		<h1 class="mt-2 text-2xl font-semibold text-zinc-900">Welcome back</h1>
 		<p class="mt-1 text-sm text-zinc-500">Log in to continue managing your work</p>
 	</div>
+
+	{#if formError}
+		<div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+			{formError?.email ?? formError?.password ?? 'Something went wrong. Please try again.'}
+		</div>
+	{/if}
 
 	<form method="POST" use:enhance class="space-y-5">
 		<Input
