@@ -2,20 +2,18 @@
 	import Input from './Input.svelte';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import type { FullAutoFill } from 'svelte/elements';
 
-	export let id: string | null = null;
+	export let id: string = '';
 	export let name = 'password';
 	export let value = '';
-
 	export let label = 'Password';
-	export let placeholder = '••••••••';
-	export let error: string | null = null;
-	export let helper: string | null = null;
+	export let error: string | null | undefined = undefined;
+	export let helper: string | undefined = undefined;
 	export let required = false;
-	export let autocomplete: string = 'current-password';
+	export let autocomplete: FullAutoFill | null | undefined = 'current-password';
 
 	let visible = false;
-	const toggle = () => (visible = !visible);
 </script>
 
 <div class="relative">
@@ -25,18 +23,16 @@
 		type={visible ? 'text' : 'password'}
 		bind:value
 		{label}
-		{placeholder}
 		{error}
 		{helper}
 		{required}
 		{autocomplete}
-		class="pr-11"
 	/>
 
 	<button
 		type="button"
-		on:click={toggle}
-		class="absolute top-8.5 right-3 text-zinc-400 hover:text-zinc-600"
+		on:click={() => (visible = !visible)}
+		class="absolute right-3 top-8.5 text-zinc-400 hover:text-zinc-600"
 		tabindex="-1"
 	>
 		{#if visible}
